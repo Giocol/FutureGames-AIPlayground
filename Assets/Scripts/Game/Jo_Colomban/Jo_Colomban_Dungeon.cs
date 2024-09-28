@@ -63,10 +63,10 @@ namespace Game
                     {
                         if (link.Target is Node neighbor)
                         {
-                            if (!closed.Contains(neighbor) && neighbor.Owner == null)
-                            {
-                                float newDistance = current.m_fDistance + Vector3.Distance(current.WorldPosition, neighbor.WorldPosition) +      // Distance to node
-                                                    neighbor.AdditionalCost + link.AdditionalCost;                                               // additional costs
+                            if (!closed.Contains(neighbor) && neighbor.Owner == null) {
+                                float newDistance = current.m_fDistance + Vector3.Distance(current.WorldPosition, neighbor.WorldPosition);      // Distance to node
+                                if(controller is HeroController)
+                                    newDistance +=  neighbor.AdditionalCost + link.AdditionalCost; // additional costs only considered by the hero
 
                                 if (closed.Contains(neighbor) ||
                                     open.Contains(neighbor))
