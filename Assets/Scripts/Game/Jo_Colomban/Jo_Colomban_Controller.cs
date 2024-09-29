@@ -14,21 +14,31 @@ namespace Jo_Colomban
 
         public override ControllerAction Think()
         {
+            Heart closestHeart = FindClosestMBFromList(Heart.AllHearts);
+            EnemyController closestEnemyController = FindClosestMBFromList(EnemyController.AllEnemies);
+
             if(HP <= healingThreshold && Heart.AllHearts.Count != 0) {
-                Heart closestHeart = FindClosestMBFromList(Heart.AllHearts);
-                return new Action_MoveTowards(this, closestHeart.gameObject.transform.position);
+                if(IsNeighbor(closestEnemyController))
+                    if(closestEnemyController.HP > 1)
+                        return new Action_Kick(this, closestEnemyController);
+                    else
+                        return new Action_Attack(this, closestEnemyController);
+                else
+                    return new Action_MoveTowards(this, closestHeart.gameObject.transform.position);
             }
+
             if(EnemyController.AllEnemies.Count != 0) {
-                EnemyController closestEnemyController = FindClosestMBFromList(EnemyController.AllEnemies);
                 if(IsNeighbor(closestEnemyController)) {
                     ControllerAction attackAction = EvaluateAttack(closestEnemyController);
                     return attackAction;
                 }
+                else if(HP < MaxHP && Heart.AllHearts.Count != 0) //this doesn't need the else, it's just there for readability
+                    return new Action_MoveTowards(this, closestHeart.gameObject.transform.position);
                 else
                     return new Action_MoveTowards(this, closestEnemyController.gameObject.transform.position);
             }
-            if(HP < MaxHP) {
-                Heart closestHeart = FindClosestMBFromList(Heart.AllHearts);
+
+            if(Heart.AllHearts.Count != 0) { //head to the closest heart even if HP is full rather than waiting
                 return new Action_MoveTowards(this, closestHeart.gameObject.transform.position);
             }
 
